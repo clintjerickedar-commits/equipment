@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-/** Blocks deactivated accounts and borrowers who have not verified their email. */
+/** Blocks deactivated accounts. */
 class EnsureActive
 {
     public function handle(Request $request, Closure $next)
@@ -17,8 +17,6 @@ class EnsureActive
             $error = null;
             if (!$user->is_active) {
                 $error = 'Your account has been deactivated. Contact an administrator.';
-            } elseif ($user->role === 'borrower' && !$user->email_verified_at) {
-                $error = 'Please verify your email address before using the system.';
             }
 
             if ($error) {

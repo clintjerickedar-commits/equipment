@@ -14,7 +14,6 @@
             <hr>
             <div class="text-start small">
                 <div class="d-flex justify-content-between mb-2"><span class="text-muted">Member since</span><strong>{{ $user->created_at->format('M j, Y') }}</strong></div>
-                <div class="d-flex justify-content-between"><span class="text-muted">Email verified</span><strong>{{ $user->email_verified_at ? 'Yes' : 'No' }}</strong></div>
             </div>
         </div></div>
     </div>

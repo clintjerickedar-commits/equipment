@@ -12,18 +12,14 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name', 'email', 'password', 'role', 'phone', 'id_number',
-        'is_active', 'otp_code', 'otp_expires_at', 'email_verified_at',
+        'is_active',
     ];
 
-    protected $hidden = ['password', 'remember_token', 'otp_code'];
+    protected $hidden = ['password', 'remember_token'];
 
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'otp_expires_at'    => 'datetime',
-            'otp_sent_at'       => 'datetime',
-            'otp_attempts'      => 'integer',
             'password'          => 'hashed',   // automatic password hashing
             'is_active'         => 'boolean',
         ];

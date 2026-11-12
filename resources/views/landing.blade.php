@@ -108,7 +108,7 @@
         </div>
         <div class="lp-steps">
             @foreach([
-                ['person-plus',       'Create an Account',               'Register with your email and verify it with a 6-digit code.'],
+                ['person-plus',       'Create an Account',               'Register with your email and start using the system right away.'],
                 ['search',            'Browse Available Equipment',      'Check live stock and filter by category.'],
                 ['send',              'Submit Borrowing Request',        'Pick items, quantities, dates and a purpose.'],
                 ['hourglass-split',   'Wait for Administrator Approval', 'The equipment office approves or replies with a reason.'],

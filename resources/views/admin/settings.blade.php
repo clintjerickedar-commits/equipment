@@ -32,8 +32,6 @@
             <ul class="list-group list-group-flush">
                 <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Borrowing period</span><strong>{{ $maxDays > 0 ? $maxDays.' day(s) max' : 'No limit' }}</strong></li>
                 <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Quantity per item</span><strong>{{ $maxQty > 0 ? $maxQty.' unit(s) max' : 'No limit' }}</strong></li>
-                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Verification code</span><strong>10 min expiry</strong></li>
-                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">Resend cooldown</span><strong>60 seconds</strong></li>
             </ul>
         </div>
     </div>

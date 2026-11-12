@@ -2,7 +2,7 @@
 @php($editing = $user->exists)
 @section('title', $editing ? 'Edit account' : 'Add account')
 @section('content')
-<x-page-header :title="$editing ? 'Edit account' : 'Add account'" :subtitle="$editing ? $user->email : 'Accounts created here are verified automatically.'">
+<x-page-header :title="$editing ? 'Edit account' : 'Add account'" :subtitle="$editing ? $user->email : 'Create an account with the selected role.'">
     <a href="{{ route('admin.users.index') }}" class="btn btn-light">Cancel</a>
 </x-page-header>
 <form method="POST" action="{{ $editing ? route('admin.users.update', $user) : route('admin.users.store') }}" class="card" novalidate>

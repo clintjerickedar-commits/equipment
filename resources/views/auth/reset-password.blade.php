@@ -1,7 +1,7 @@
 @extends('layouts.guest')
 @section('title', 'Reset password')
 @section('content')
-    <div class="otp-icon"><i class="bi bi-shield-lock"></i></div>
+    <div class="auth-icon"><i class="bi bi-shield-lock"></i></div>
     <h1 class="h3 mb-1">Choose a new password</h1>
     <p class="text-muted mb-4">Use at least 8 characters with letters and numbers.</p>
     <form method="POST" action="{{ route('password.update') }}" novalidate>

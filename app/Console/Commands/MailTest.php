@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Services\OtpService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
@@ -21,7 +20,7 @@ class MailTest extends Command
             $cfg  = config('mail.mailers.smtp');
             $user = (string) ($cfg['username'] ?? '');
             $this->line('SMTP host    : ' . ($cfg['host'] ?? '-') . ':' . ($cfg['port'] ?? '-'));
-            $this->line('SMTP user    : ' . ($user !== '' ? (str_contains($user, '@') ? OtpService::maskEmail($user) : $user) : '<error>(empty)</error>'));
+            $this->line('SMTP user    : ' . ($user !== '' ? (str_contains($user, '@') ? $this->maskEmail($user) : $user) : '<error>(empty)</error>'));
             $this->line('SMTP password: ' . (!empty($cfg['password']) ? 'set (' . strlen($cfg['password']) . ' characters)' : '<error>(empty)</error>'));
             $this->line('From address : ' . config('mail.from.address'));
         }
@@ -53,5 +52,15 @@ class MailTest extends Command
 
         $this->info('Sent! Check the inbox (and Spam) of ' . $this->argument('email') . '.');
         return self::SUCCESS;
+    }
+
+    private function maskEmail(string $email): string
+    {
+        [$local, $domain] = array_pad(explode('@', $email, 2), 2, '');
+        $visible = strlen($local) > 2
+            ? substr($local, 0, 1) . str_repeat('*', max(3, strlen($local) - 2)) . substr($local, -1)
+            : substr($local, 0, 1) . '***';
+
+        return $visible . '@' . $domain;
     }
 }

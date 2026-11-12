@@ -5,12 +5,10 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
-use App\Services\OtpService;
+use Illuminate\Support\Facades\Auth;
 
 class RegisterController extends Controller
 {
-    public function __construct(private OtpService $otp) {}
-
     public function show()
     {
         return view('auth.register');
@@ -19,7 +17,6 @@ class RegisterController extends Controller
     public function store(RegisterRequest $request)
     {
         // Role is always "borrower" for public registration (never taken from the form).
-        // email_verified_at stays NULL = unverified account.
         $user = User::create([
             'name'      => $request->name,
             'email'     => $request->email,
@@ -30,14 +27,9 @@ class RegisterController extends Controller
             'is_active' => true,
         ]);
 
-        $request->session()->put('otp_user_id', $user->id);
+        Auth::login($user);
+        $request->session()->regenerate();
 
-        // The code is emailed to the address the user typed in the form
-        if ($this->otp->send($user) === 'sent') {
-            return redirect()->route('otp.show')->with('success', 'Account created! We sent a verification code to ' . OtpService::maskEmail($user->email) . '.');
-        }
-
-        // Only claim success when the email really was handed to the mail server
-        return redirect()->route('otp.show')->with('error', 'Your account was created, but we could not send the verification email. Check your email address, then click "Resend code".');
+        return redirect()->route('dashboard')->with('success', 'Account created successfully.');
     }
 }

@@ -40,8 +40,7 @@ class UserController extends Controller
             'password'  => ['required', 'confirmed', Password::min(8)->letters()->numbers()],
         ]);
 
-        // Accounts created by an administrator are trusted, so they skip email verification
-        User::create($data + ['is_active' => true, 'email_verified_at' => now()]);
+        User::create($data + ['is_active' => true]);
 
         return redirect()->route('admin.users.index')->with('success', 'Account created.');
     }

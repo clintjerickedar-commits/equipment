@@ -5,14 +5,11 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Rules\Recaptcha;
-use App\Services\OtpService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-    public function __construct(private OtpService $otp) {}
-
     public function show()
     {
         return view('auth.login');
@@ -35,18 +32,6 @@ class LoginController extends Controller
 
         if (!Auth::attempt(['email' => $credentials['email'], 'password' => $credentials['password']], $request->boolean('remember'))) {
             return back()->withInput($request->only('email'))->withErrors(['email' => 'Invalid email or password.']);
-        }
-
-        // Unverified borrowers cannot log in: send them to the verification page instead
-        if (Auth::user()->role === 'borrower' && !Auth::user()->email_verified_at) {
-            $pending = Auth::user();
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-            $request->session()->put('otp_user_id', $pending->id);
-            $this->otp->ensureCode($pending);
-
-            return redirect()->route('otp.show')->with('status', 'Please verify your email address before logging in.');
         }
 
         $request->session()->regenerate();

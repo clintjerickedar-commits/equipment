@@ -10,7 +10,6 @@
         <dt class="col-sm-3">Email</dt><dd class="col-sm-9">{{ $borrower->email }}</dd>
         <dt class="col-sm-3">ID number</dt><dd class="col-sm-9">{{ $borrower->id_number }}</dd>
         <dt class="col-sm-3">Phone</dt><dd class="col-sm-9">{{ $borrower->phone ?: '—' }}</dd>
-        <dt class="col-sm-3">Email verified</dt><dd class="col-sm-9">{{ $borrower->email_verified_at ? $borrower->email_verified_at->format('M j, Y') : 'Not yet' }}</dd>
         <dt class="col-sm-3">Account</dt><dd class="col-sm-9 mb-0"><x-status-badge :status="$borrower->is_active ? 'active' : 'inactive'" /></dd>
     </dl>
 </div></div>

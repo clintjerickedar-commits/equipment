@@ -21,7 +21,7 @@ class ProfileController extends Controller
             'id_number' => ['nullable', 'string', 'max:50', \Illuminate\Validation\Rule::unique('users', 'id_number')->ignore($request->user()->id)],
         ]);
 
-        // Email is read-only: it is the verified login identity
+        // Email is read-only because it is the account's login identity.
         $request->user()->update($data);
 
         return back()->with('success', 'Profile updated.');

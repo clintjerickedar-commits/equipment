@@ -1,7 +1,7 @@
 @extends('layouts.guest')
 @section('title', 'Forgot password')
 @section('content')
-    <div class="otp-icon"><i class="bi bi-key"></i></div>
+    <div class="auth-icon"><i class="bi bi-key"></i></div>
     <h1 class="h3 mb-1">Forgot your password?</h1>
     <p class="text-muted mb-4">Enter your account email and we'll send you a link to reset it.</p>
     <form method="POST" action="{{ route('password.email') }}" novalidate>
