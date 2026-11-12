@@ -10,6 +10,7 @@ use App\Models\ReturnRecord;
 use App\Models\User;
 use App\Services\BorrowingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class BorrowingSystemTest extends TestCase
@@ -44,6 +45,28 @@ class BorrowingSystemTest extends TestCase
     }
 
     // ---------- Authentication ----------
+    public function test_registration_creates_borrower_and_otp_verification_logs_in(): void
+    {
+        $this->post('/register', ['name' => 'New User', 'email' => 'new@t.test', 'id_number' => '99', 'password' => 'Password123', 'password_confirmation' => 'Password123'])
+            ->assertRedirect(route('otp.show'));
+
+        $user = User::where('email', 'new@t.test')->first();
+        $this->assertSame('borrower', $user->role);
+        $this->assertTrue(Hash::check('Password123', $user->password)); // hashed
+
+        $user->update(['otp_code' => Hash::make('123456'), 'otp_expires_at' => now()->addMinutes(5)]);
+        $this->withSession(['otp_user_id' => $user->id])->post('/verify-otp', ['code' => '123456'])->assertRedirect(route('dashboard'));
+        $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_wrong_otp_is_rejected(): void
+    {
+        $user = $this->borrower();
+        $user->update(['otp_code' => Hash::make('123456'), 'otp_expires_at' => now()->addMinutes(5), 'email_verified_at' => null]);
+        $this->withSession(['otp_user_id' => $user->id])->post('/verify-otp', ['code' => '000000'])->assertSessionHasErrors('code');
+        $this->assertGuest();
+    }
+
     public function test_login_success_and_invalid_credentials(): void
     {
         $this->borrower();
