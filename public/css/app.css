@@ -334,7 +334,7 @@ dd { margin-bottom: 0; }
 
 /* ==========================================================
    AUTH SYSTEM - futuristic red & black (borrower login, administrator sign-in,
-   registration, email verification, forgot / reset password)
+   registration, forgot / reset password)
    ========================================================== */
 .auth-stage { position: relative; min-height: 100vh; overflow: hidden; isolation: isolate;
   background: radial-gradient(1100px 700px at 12% -5%, rgba(139,0,0,.6), transparent 60%), radial-gradient(900px 700px at 100% 105%, rgba(255,0,0,.22), transparent 60%),

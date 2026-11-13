@@ -25,6 +25,7 @@ class RegisterController extends Controller
             'password'  => $request->password, // hashed by the model cast
             'role'      => 'borrower',
             'is_active' => true,
+            'email_verified_at' => now(),
         ]);
 
         Auth::login($user);

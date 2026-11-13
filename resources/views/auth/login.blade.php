@@ -8,7 +8,7 @@
     <span class="chip"><i class="bi bi-patch-check"></i> Fast approvals</span>
     <span class="chip"><i class="bi bi-alarm"></i> Return reminders</span>
 @endsection
-@section('foot_note', 'Secure sign-in with email verification')
+@section('foot_note', 'Secure sign-in to your account')
 
 @section('content')
     <div class="card-head">

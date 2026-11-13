@@ -20,7 +20,7 @@
             @yield('content')
         </div>
 
-        <p class="auth-note"><i class="bi bi-shield-check"></i>@yield('foot_note', 'Secure sign-up with email verification') · © {{ date('Y') }} EquipTrack</p>
+        <p class="auth-note"><i class="bi bi-shield-check"></i>@yield('foot_note', 'Secure access to EquipTrack') · © {{ date('Y') }} EquipTrack</p>
     </div>
 </div>
 @include('partials.scripts')

@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -18,11 +17,6 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:6,1'); // brute-force protection
     Route::get('/register', [RegisterController::class, 'show'])->name('register');
     Route::post('/register', [RegisterController::class, 'store'])->middleware('throttle:10,1');
-
-    // Email OTP verification
-    Route::get('/verify-otp', [OtpController::class, 'show'])->name('otp.show');
-    Route::post('/verify-otp', [OtpController::class, 'verify'])->middleware('throttle:10,1')->name('otp.verify');
-    Route::post('/verify-otp/resend', [OtpController::class, 'resend'])->middleware('throttle:6,1')->name('otp.resend');
 
     // Forgot / reset password
     Route::get('/forgot-password', [PasswordResetController::class, 'showForgot'])->name('password.request');

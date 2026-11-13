@@ -1,7 +1,7 @@
 @extends('layouts.guest')
 @section('title', 'Create account')
 @section('card_class', 'wide')
-@section('foot_note', 'Secure sign-up with email verification')
+@section('foot_note', 'Secure sign-up with instant account access')
 
 @section('content')
     <div class="card-head">

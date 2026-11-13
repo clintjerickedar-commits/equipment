@@ -106,7 +106,7 @@ class PagesRenderTest extends TestCase
             ->assertSee('class="tech-bg"', false)->assertSee('Back to Home');
 
         $this->get('/register')->assertOk()->assertSee('Join EquipTrack and start borrowing equipment today.')->assertSee('Already have an account?')
-            ->assertSee('Log in instead')->assertSee('Secure sign-up with email verification')
+            ->assertSee('Log in instead')->assertSee('Secure sign-up with instant account access')
             ->assertSee('placeholder="Enter your full name"', false)->assertDontSee('Maria Santos');
 
         // the other pages that share the centered layout still render with Back to Home
