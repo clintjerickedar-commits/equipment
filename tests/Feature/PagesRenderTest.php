@@ -175,6 +175,22 @@ class PagesRenderTest extends TestCase
         $this->assertMatchesRegularExpression('/Good (morning|afternoon|evening), Demo/', $page->getContent());
     }
 
+    public function test_dashboard_greetings_use_the_configured_local_timezone(): void
+    {
+        $this->seed();
+        \Carbon\Carbon::setTestNow(new \Carbon\Carbon('2026-11-13 13:30:00', 'UTC'));
+
+        try {
+            $admin = User::where('email', 'admin@demo.test')->first();
+            $this->actingAs($admin)->get('/admin')->assertSeeText('Good evening, Demo');
+
+            $borrower = User::where('email', 'borrower@demo.test')->first();
+            $this->actingAs($borrower)->get('/borrower')->assertSeeText('Good evening,');
+        } finally {
+            \Carbon\Carbon::setTestNow();
+        }
+    }
+
     public function test_no_view_mixes_one_line_php_with_php_blocks(): void
     {
         // Blade turns everything between the FIRST "@php" and the first "@endphp" into one raw PHP block.
