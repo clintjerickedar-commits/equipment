@@ -52,6 +52,28 @@ class RegistrationTest extends TestCase
         $this->assertSame(1, User::where('role', 'borrower')->count());
     }
 
+    public function test_registration_shows_and_requires_recaptcha_when_keys_are_configured(): void
+    {
+        config([
+            'services.recaptcha.site' => 'test-site-key',
+            'services.recaptcha.secret' => 'test-secret-key',
+        ]);
+
+        $this->get('/register')->assertOk()
+            ->assertSee('class="g-recaptcha"', false)
+            ->assertSee('data-sitekey="test-site-key"', false);
+
+        $this->post('/register', [
+            'name' => 'Test Student',
+            'email' => 'student123@gmail.com',
+            'id_number' => '2024-9999',
+            'password' => 'Password123',
+            'password_confirmation' => 'Password123',
+        ])->assertSessionHasErrors('g-recaptcha-response');
+
+        $this->assertDatabaseMissing('users', ['email' => 'student123@gmail.com']);
+    }
+
     public function test_forgot_password_sends_reset_link(): void
     {
         Notification::fake();
