@@ -7,7 +7,6 @@ use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Borrower;
-use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -39,7 +38,6 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'password'])->middleware('throttle:6,1')->name('profile.password');
-    Route::post('/notifications/read', [NotificationController::class, 'markRead'])->name('notifications.read');
 });
 
 // ---------- Administrator sign-in (guests only) ----------
