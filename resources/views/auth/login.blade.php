@@ -21,17 +21,17 @@
         <div class="alert alert-danger d-flex gap-2" role="alert"><i class="bi bi-exclamation-triangle-fill"></i><div>{{ $errors->first('email') }}</div></div>
     @endif
 
-    <form method="POST" action="{{ route('login') }}" novalidate>
+    <form method="POST" action="{{ route('login') }}" autocomplete="off" data-clear-credentials novalidate>
         @csrf
         <div class="mb-3">
             <label for="email" class="form-label">Email address</label>
             <div class="input-icon"><i class="bi bi-envelope"></i>
-                <input type="email" id="email" name="email" value="{{ old('email') }}" class="form-control @error('email') is-invalid @enderror" placeholder="you@school.edu" autocomplete="email" required autofocus></div>
+                <input type="email" id="email" name="email" class="form-control @error('email') is-invalid @enderror" placeholder="you@school.edu" autocomplete="off" required></div>
         </div>
         <div class="mb-3">
             <div class="label-row"><label for="password" class="form-label">Password</label><a href="{{ route('password.request') }}">Forgot password?</a></div>
             <div class="input-icon"><i class="bi bi-lock"></i>
-                <input type="password" id="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Enter your password" autocomplete="current-password" required>
+                <input type="password" id="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Enter your password" autocomplete="new-password" required>
                 <button type="button" class="toggle-pw no-loading" data-toggle-password="#password" aria-label="Show or hide password"><i class="bi bi-eye"></i></button></div>
             @error('password') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
         </div>

@@ -6,6 +6,55 @@
     document.getElementById('sidebarToggle')?.addEventListener('click', () => { sidebar.classList.toggle('open'); backdrop.classList.toggle('open'); });
     backdrop?.addEventListener('click', () => { sidebar.classList.remove('open'); backdrop.classList.remove('open'); });
 
+    const notificationMenu = document.querySelector('.notif-menu');
+    const notificationToggle = notificationMenu?.closest('.dropdown')?.querySelector('[data-bs-toggle="dropdown"]');
+    if (notificationMenu && notificationToggle) {
+        let markingRead = null;
+        let notificationsMarked = false;
+        const markNotificationsRead = () => {
+            if (notificationsMarked) return Promise.resolve(true);
+            if (markingRead) return markingRead;
+            const keys = Array.from(notificationMenu.querySelectorAll('[data-notification-key]'))
+                .map(item => item.dataset.notificationKey);
+            if (!keys.length) return Promise.resolve(true);
+
+            const error = notificationMenu.querySelector('[data-notification-error]');
+            markingRead = fetch(notificationMenu.dataset.readUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify({ keys }),
+            }).then(response => {
+                if (!response.ok) throw new Error('Notification read request failed.');
+                notificationMenu.querySelector('.head .badge-soft').textContent = '0';
+                document.querySelector('.notif-badge')?.remove();
+                error.classList.add('d-none');
+                notificationsMarked = true;
+                return true;
+            }).catch(() => {
+                error.classList.remove('d-none');
+                return false;
+            }).finally(() => {
+                markingRead = null;
+            });
+
+            return markingRead;
+        };
+
+        notificationToggle.addEventListener('shown.bs.dropdown', markNotificationsRead);
+        notificationMenu.querySelectorAll('[data-notification-key]').forEach(item => {
+            item.addEventListener('click', event => {
+                event.preventDefault();
+                markNotificationsRead().then(success => {
+                    if (success) window.location.assign(item.href);
+                });
+            });
+        });
+    }
+
     // Confirmation modal: <form data-confirm="Message" data-confirm-title="Title" data-confirm-button="Delete">
     const modalEl = document.getElementById('confirmModal');
     let pendingForm = null;

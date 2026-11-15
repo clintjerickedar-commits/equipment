@@ -36,16 +36,12 @@ class AppServiceProvider extends ServiceProvider
 
         try {
             if ($user->isAdmin()) {
-                $pendingTotal = BorrowingRequest::where('status', 'pending')->count();
-                $lateTotal    = BorrowingRequest::late()->count();
-                $count        = $pendingTotal + $lateTotal;
-
                 foreach (BorrowingRequest::with('user')->where('status', 'pending')->latest()->take(4)->get() as $r) {
-                    $items->push(['icon' => 'inbox', 'tone' => 'amber', 'title' => $r->user->name . ' sent a request',
+                    $items->push(['key' => 'admin:pending:' . $r->id, 'icon' => 'inbox', 'tone' => 'amber', 'title' => $r->user->name . ' sent a request',
                         'text' => $r->request_no . ' is waiting for review', 'url' => route('admin.requests.show', $r), 'time' => $r->created_at]);
                 }
                 foreach (BorrowingRequest::with('user')->late()->orderBy('expected_return_date')->take(3)->get() as $r) {
-                    $items->push(['icon' => 'alarm', 'tone' => 'red', 'title' => $r->user->name . ' is overdue',
+                    $items->push(['key' => 'admin:overdue:' . $r->id, 'icon' => 'alarm', 'tone' => 'red', 'title' => $r->user->name . ' is overdue',
                         'text' => $r->request_no . ' was due ' . $r->expected_return_date->format('M j'), 'url' => route('admin.requests.show', $r), 'time' => $r->expected_return_date]);
                 }
             } else {
@@ -53,7 +49,7 @@ class AppServiceProvider extends ServiceProvider
                     ->where('reviewed_at', '>=', now()->subDays(7))->latest('reviewed_at')->take(4)->get();
                 foreach ($reviewed as $r) {
                     $ok = $r->status === 'approved';
-                    $items->push(['icon' => $ok ? 'check2-circle' : 'x-circle', 'tone' => $ok ? 'green' : 'red',
+                    $items->push(['key' => 'borrower:reviewed:' . $r->id . ':' . $r->status, 'icon' => $ok ? 'check2-circle' : 'x-circle', 'tone' => $ok ? 'green' : 'red',
                         'title' => $ok ? 'Request approved' : 'Request rejected', 'text' => $r->request_no,
                         'url' => route('borrower.requests.show', $r), 'time' => $r->reviewed_at]);
                 }
@@ -62,12 +58,15 @@ class AppServiceProvider extends ServiceProvider
                     ->whereDate('expected_return_date', '<=', now()->addDays(3)->toDateString())->orderBy('expected_return_date')->take(3)->get();
                 foreach ($due as $r) {
                     $late = $r->is_late;
-                    $items->push(['icon' => 'alarm', 'tone' => $late ? 'red' : 'amber', 'title' => $late ? 'Return is overdue' : 'Return due soon',
+                    $items->push(['key' => 'borrower:due:' . $r->id . ':' . $r->expected_return_date->toDateString(),
+                        'icon' => 'alarm', 'tone' => $late ? 'red' : 'amber', 'title' => $late ? 'Return is overdue' : 'Return due soon',
                         'text' => $r->request_no . ' · due ' . $r->expected_return_date->format('M j'),
                         'url' => route('borrower.requests.show', $r), 'time' => $r->expected_return_date]);
                 }
-                $count = $items->count();
             }
+
+            $readKeys = session('notifications.read.' . $user->id, []);
+            $count = $items->reject(fn ($item) => in_array($item['key'], $readKeys, true))->count();
         } catch (\Throwable $e) {
             report($e); // never break a page because of the bell
         }

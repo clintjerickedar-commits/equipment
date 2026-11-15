@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\BorrowingRequest;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -63,6 +64,38 @@ class PagesRenderTest extends TestCase
         $this->actingAs($ana)->get('/borrower')->assertOk()->assertSee('Request approved');
     }
 
+    public function test_viewing_notifications_clears_the_unread_count(): void
+    {
+        $this->seed();
+        $borrower = User::create([
+            'name' => 'Notification Borrower',
+            'email' => 'notification@demo.test',
+            'password' => 'Borrower@123',
+            'role' => 'borrower',
+            'is_active' => true,
+            'email_verified_at' => now(),
+        ]);
+        $request = BorrowingRequest::create([
+            'user_id' => $borrower->id,
+            'borrow_date' => now()->toDateString(),
+            'expected_return_date' => now()->addDays(2)->toDateString(),
+            'purpose' => 'Notification test',
+            'status' => 'rejected',
+            'reviewed_at' => now(),
+        ]);
+        $key = 'borrower:reviewed:' . $request->id . ':rejected';
+
+        $this->actingAs($borrower)->get('/borrower')
+            ->assertSee('<span class="notif-badge">', false)
+            ->assertSee($key);
+        $this->postJson(route('notifications.read'), ['keys' => [$key]])
+            ->assertOk()
+            ->assertSessionHas('notifications.read.' . $borrower->id, [$key]);
+        $this->get('/borrower')
+            ->assertDontSee('<span class="notif-badge">', false)
+            ->assertSee('Request rejected');
+    }
+
     public function test_back_to_home_button_on_login_and_register_points_to_the_landing_page(): void
     {
         foreach (['/login', '/register'] as $url) {
@@ -86,6 +119,12 @@ class PagesRenderTest extends TestCase
         $this->get('/login')->assertOk()->assertSee('Welcome back')->assertSee('Remember me')->assertSee('Forgot password?')
             ->assertSee('Create an account')->assertSee('Administrator sign in')
             ->assertSee('href="' . route('admin.login') . '"', false)->assertSee('href="' . route('password.request') . '"', false);
+        $loginPage = $this->get('/login')->assertOk()
+            ->assertSee('autocomplete="off" data-clear-credentials', false)
+            ->assertSee('autocomplete="new-password"', false);
+        preg_match('/<input type="email"[^>]*id="email"[^>]*>/', $loginPage->getContent(), $emailInput);
+        $this->assertNotEmpty($emailInput);
+        $this->assertStringNotContainsString('value=', $emailInput[0]);
 
         // Registration
         $this->get('/register')->assertOk()->assertSee('Create your account')->assertSee('Enter your full name', false)

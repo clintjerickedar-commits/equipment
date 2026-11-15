@@ -39,6 +39,16 @@
 </div>
 @include('partials.scripts')
 <script>
+    const clearLoginCredentials = () => {
+        document.querySelectorAll('form[data-clear-credentials]').forEach(form => {
+            form.querySelectorAll('input[type="email"], input[type="password"]').forEach(input => {
+                input.value = '';
+            });
+        });
+    };
+    clearLoginCredentials();
+    window.addEventListener('pageshow', clearLoginCredentials);
+
     // Show / hide password buttons: <button data-toggle-password="#fieldId">
     document.querySelectorAll('[data-toggle-password]').forEach(btn => btn.addEventListener('click', () => {
         const input = document.querySelector(btn.dataset.togglePassword), show = input.type === 'password';

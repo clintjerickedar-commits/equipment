@@ -67,10 +67,11 @@
                     <i class="bi bi-bell"></i>
                     @if($notif['count'] > 0)<span class="notif-badge">{{ $notif['count'] > 9 ? '9+' : $notif['count'] }}</span>@endif
                 </button>
-                <div class="dropdown-menu dropdown-menu-end notif-menu">
+                <div class="dropdown-menu dropdown-menu-end notif-menu" data-read-url="{{ route('notifications.read') }}">
                     <div class="head"><span>Notifications</span><span class="badge-soft {{ $notif['count'] > 0 ? 'b-pending' : 'b-cancelled' }}">{{ $notif['count'] }}</span></div>
+                    <div class="px-3 small text-danger d-none" data-notification-error role="alert">Could not mark notifications as read. Please try again.</div>
                     @forelse($notif['items'] as $n)
-                        <a href="{{ $n['url'] }}" class="item">
+                        <a href="{{ $n['url'] }}" class="item" data-notification-key="{{ $n['key'] }}">
                             <span class="dot tone-{{ $n['tone'] }}"><i class="bi bi-{{ $n['icon'] }}"></i></span>
                             <div class="min-w-0"><div class="fw-semibold text-truncate">{{ $n['title'] }}</div><small>{{ $n['text'] }} · {{ $n['time']->diffForHumans() }}</small></div>
                         </a>
