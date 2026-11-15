@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\BorrowingRequest;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -61,6 +62,36 @@ class PagesRenderTest extends TestCase
         // Ana has an approved request in the demo data
         $ana = User::where('email', 'ana@demo.test')->first();
         $this->actingAs($ana)->get('/borrower')->assertOk()->assertSee('Request approved');
+    }
+
+    public function test_viewing_notifications_clears_the_unread_count_for_that_user(): void
+    {
+        $this->seed();
+        $borrower = User::create([
+            'name' => 'Notification Borrower',
+            'email' => 'notification@demo.test',
+            'password' => 'Borrower@123',
+            'role' => 'borrower',
+            'is_active' => true,
+            'email_verified_at' => now(),
+        ]);
+        $request = BorrowingRequest::create([
+            'user_id' => $borrower->id,
+            'borrow_date' => now()->toDateString(),
+            'expected_return_date' => now()->addDays(2)->toDateString(),
+            'purpose' => 'Notification test',
+            'status' => 'rejected',
+            'reviewed_at' => now(),
+        ]);
+        $key = 'borrower:reviewed:' . $request->id . ':rejected';
+
+        $this->actingAs($borrower)->get('/borrower')->assertSee('<span class="notif-badge">', false)->assertSee($key);
+        $this->postJson(route('notifications.read'), ['keys' => [$key]])->assertOk();
+        $this->get('/borrower')->assertDontSee('<span class="notif-badge">', false)->assertSee('Request rejected');
+        $this->assertDatabaseHas('notification_reads', [
+            'user_id' => $borrower->id,
+            'notification_key' => $key,
+        ]);
     }
 
     public function test_back_to_home_button_on_login_and_register_points_to_the_landing_page(): void
