@@ -36,7 +36,7 @@ class EquipmentImageTest extends TestCase
             ->assertHeader('content-type', 'image/png');
     }
 
-    public function test_equipment_image_returns_not_found_when_photo_is_missing(): void
+    public function test_equipment_image_shows_a_product_illustration_when_photo_is_missing(): void
     {
         Storage::fake('public');
 
@@ -52,6 +52,30 @@ class EquipmentImageTest extends TestCase
             'status' => 'active',
         ]);
 
-        $this->get($equipment->image_url)->assertNotFound();
+        $this->get($equipment->image_url)
+            ->assertOk()
+            ->assertHeader('content-type', 'image/svg+xml')
+            ->assertSee('LCD Projector');
+    }
+
+    public function test_equipment_without_an_assigned_photo_still_has_an_image(): void
+    {
+        Storage::fake('public');
+
+        $category = Category::create(['name' => 'Computing']);
+        $equipment = Equipment::create([
+            'equipment_code' => 'EQ-0002',
+            'category_id' => $category->id,
+            'name' => 'Laptop',
+            'quantity' => 1,
+            'available_quantity' => 1,
+            'condition' => 'good',
+            'status' => 'active',
+        ]);
+
+        $this->get($equipment->image_url)
+            ->assertOk()
+            ->assertHeader('content-type', 'image/svg+xml')
+            ->assertSee('Laptop');
     }
 }

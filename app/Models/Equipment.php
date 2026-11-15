@@ -48,7 +48,7 @@ class Equipment extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        return $this->image_path ? route('equipment.image', $this) : null;
+        return $this->exists ? route('equipment.image', $this) : null;
     }
 
     /** Only active equipment with stock can be borrowed. */

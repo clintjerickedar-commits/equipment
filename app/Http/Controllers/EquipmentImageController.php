@@ -9,11 +9,16 @@ class EquipmentImageController extends Controller
 {
     public function show(Equipment $equipment)
     {
-        abort_unless($equipment->image_path, 404);
+        if ($equipment->image_path) {
+            $disk = Storage::disk('public');
 
-        $disk = Storage::disk('public');
-        abort_unless($disk->exists($equipment->image_path), 404);
+            if ($disk->exists($equipment->image_path)) {
+                return $disk->response($equipment->image_path);
+            }
+        }
 
-        return $disk->response($equipment->image_path);
+        return response()
+            ->view('equipment.image', ['item' => $equipment])
+            ->header('Content-Type', 'image/svg+xml');
     }
 }
