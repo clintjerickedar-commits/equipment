@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\BorrowingRequest;
 use App\Models\User;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 
 class NotificationService
 {
@@ -78,11 +77,7 @@ class NotificationService
         }
 
         $keys = $items->pluck('key');
-        $readKeys = DB::table('notification_reads')
-            ->where('user_id', $user->id)
-            ->whereIn('notification_key', $keys)
-            ->pluck('notification_key')
-            ->all();
+        $readKeys = session()->get('notifications.read.' . $user->id, []);
 
         return [
             'items' => $items,
@@ -93,19 +88,8 @@ class NotificationService
     /** @param string[] $keys */
     public function markRead(User $user, array $keys): void
     {
-        $now = now();
-        $records = collect($keys)->unique()->map(fn ($key) => [
-            'user_id' => $user->id,
-            'notification_key' => $key,
-            'read_at' => $now,
-        ])->all();
-
-        if ($records) {
-            DB::table('notification_reads')->upsert(
-                $records,
-                ['user_id', 'notification_key'],
-                ['read_at']
-            );
-        }
+        $sessionKey = 'notifications.read.' . $user->id;
+        $readKeys = session()->get($sessionKey, []);
+        session()->put($sessionKey, array_values(array_unique(array_merge($readKeys, $keys))));
     }
 }

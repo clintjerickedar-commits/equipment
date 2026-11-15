@@ -86,12 +86,10 @@ class PagesRenderTest extends TestCase
         $key = 'borrower:reviewed:' . $request->id . ':rejected';
 
         $this->actingAs($borrower)->get('/borrower')->assertSee('<span class="notif-badge">', false)->assertSee($key);
-        $this->postJson(route('notifications.read'), ['keys' => [$key]])->assertOk();
+        $this->postJson(route('notifications.read'), ['keys' => [$key]])
+            ->assertOk()
+            ->assertSessionHas('notifications.read.' . $borrower->id, [$key]);
         $this->get('/borrower')->assertDontSee('<span class="notif-badge">', false)->assertSee('Request rejected');
-        $this->assertDatabaseHas('notification_reads', [
-            'user_id' => $borrower->id,
-            'notification_key' => $key,
-        ]);
     }
 
     public function test_back_to_home_button_on_login_and_register_points_to_the_landing_page(): void
