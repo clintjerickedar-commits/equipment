@@ -48,7 +48,8 @@ class Equipment extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        return $this->exists ? route('equipment.image', $this) : null;
+        // asset() follows the host you opened the site with, so images work on localhost, 127.0.0.1 or a live domain
+        return $this->image_path ? asset('storage/' . $this->image_path) : null;
     }
 
     /** Only active equipment with stock can be borrowed. */
