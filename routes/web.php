@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\EquipmentImageController;
 use App\Http\Controllers\Borrower;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Http\Request;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 
 // ---------- Public ----------
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/equipment/{equipment}/image', [EquipmentImageController::class, 'show'])->name('equipment.image');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('login');
